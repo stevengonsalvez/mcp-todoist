@@ -64,17 +64,12 @@ class TodoistResources:
             # Convert tasks to dictionaries
             tasks_data = []
             for task in tasks_list:
-                task_dict = {
-                    "id": task.id,
-                    "content": task.content,
-                    "description": task.description,
-                    "url": task.url,
-                    "created_at": task.created_at,
-                    "priority": task.priority,
-                    "project_id": task.project_id,
-                    "section_id": task.section_id,
-                    "parent_id": task.parent_id,
-                }
+                # Safely build task dictionary by checking each attribute
+                task_dict = {}
+                for attr in ["id", "content", "description", "url", "created_at", 
+                             "priority", "project_id", "section_id", "parent_id"]:
+                    if hasattr(task, attr):
+                        task_dict[attr] = getattr(task, attr)
                 
                 # Handle labels
                 if hasattr(task, "labels"):
