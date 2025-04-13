@@ -14,7 +14,6 @@ from config import load_config
 from todoist_tools import TodoistTools
 from todoist_resources import TodoistResources
 
-
 def create_server() -> FastMCP:
     """
     Create and configure the MCP server.
@@ -28,11 +27,11 @@ def create_server() -> FastMCP:
     # Create MCP server
     server = FastMCP(
         config.server_name,
-        # List dependencies for installation
+        # List dependencies for installation without version constraints
         dependencies=[
-            "todoist-api-python>=2.0.0",
-            "pydantic>=2.0.0",
-            "python-dotenv>=1.0.0",
+            "todoist-api-python",
+            "pydantic",
+            "python-dotenv",
         ],
     )
     
@@ -218,111 +217,94 @@ def create_server() -> FastMCP:
     # Register Todoist resources
     
     @server.resource("todoist://tasks")
-    async def tasks_resource(ctx: Context = None) -> Tuple[str, str]:
+    async def tasks_resource() -> Tuple[str, str]:
         """
         Get all tasks as a resource.
         
-        Args:
-            ctx: MCP context (injected automatically)
-            
         Returns:
             Tuple of (data, mime_type)
         """
-        return await todoist_resources.get_tasks_resource(ctx=ctx)
+        return await todoist_resources.get_tasks_resource()
     
     @server.resource("todoist://tasks/project/{project_id}")
-    async def project_tasks_resource(project_id: str, ctx: Context = None) -> Tuple[str, str]:
+    async def project_tasks_resource(project_id: str) -> Tuple[str, str]:
         """
         Get tasks for a specific project as a resource.
         
         Args:
             project_id: ID of the project to get tasks for
-            ctx: MCP context (injected automatically)
             
         Returns:
             Tuple of (data, mime_type)
         """
         return await todoist_resources.get_tasks_resource(
             project_id=project_id,
-            ctx=ctx,
         )
     
     @server.resource("todoist://tasks/section/{section_id}")
-    async def section_tasks_resource(section_id: str, ctx: Context = None) -> Tuple[str, str]:
+    async def section_tasks_resource(section_id: str) -> Tuple[str, str]:
         """
         Get tasks for a specific section as a resource.
         
         Args:
             section_id: ID of the section to get tasks for
-            ctx: MCP context (injected automatically)
             
         Returns:
             Tuple of (data, mime_type)
         """
         return await todoist_resources.get_tasks_resource(
             section_id=section_id,
-            ctx=ctx,
         )
     
     @server.resource("todoist://tasks/label/{label}")
-    async def label_tasks_resource(label: str, ctx: Context = None) -> Tuple[str, str]:
+    async def label_tasks_resource(label: str) -> Tuple[str, str]:
         """
         Get tasks with a specific label as a resource.
         
         Args:
             label: Label name to get tasks for
-            ctx: MCP context (injected automatically)
             
         Returns:
             Tuple of (data, mime_type)
         """
         return await todoist_resources.get_tasks_resource(
             label=label,
-            ctx=ctx,
         )
     
     @server.resource("todoist://projects")
-    async def projects_resource(ctx: Context = None) -> Tuple[str, str]:
+    async def projects_resource() -> Tuple[str, str]:
         """
         Get all projects as a resource.
         
-        Args:
-            ctx: MCP context (injected automatically)
-            
         Returns:
             Tuple of (data, mime_type)
         """
-        return await todoist_resources.get_projects_resource(ctx=ctx)
+        return await todoist_resources.get_projects_resource()
     
     @server.resource("todoist://sections/{project_id}")
-    async def sections_resource(project_id: str, ctx: Context = None) -> Tuple[str, str]:
+    async def sections_resource(project_id: str) -> Tuple[str, str]:
         """
         Get sections for a project as a resource.
         
         Args:
             project_id: ID of the project to get sections for
-            ctx: MCP context (injected automatically)
             
         Returns:
             Tuple of (data, mime_type)
         """
         return await todoist_resources.get_sections_resource(
             project_id=project_id,
-            ctx=ctx,
         )
     
     @server.resource("todoist://labels")
-    async def labels_resource(ctx: Context = None) -> Tuple[str, str]:
+    async def labels_resource() -> Tuple[str, str]:
         """
         Get all labels as a resource.
         
-        Args:
-            ctx: MCP context (injected automatically)
-            
         Returns:
             Tuple of (data, mime_type)
         """
-        return await todoist_resources.get_labels_resource(ctx=ctx)
+        return await todoist_resources.get_labels_resource()
     
     # Add some helpful prompts
     
@@ -358,13 +340,9 @@ def create_server() -> FastMCP:
     
     return server
 
-
 def main():
     """Main entry point for the MCP-Todoist server."""
     try:
-        # Create the MCP server
-        server = create_server()
-        
         # Run the server
         server.run()
     except Exception as e:
@@ -374,6 +352,8 @@ def main():
         return 1
     return 0
 
+# Create the server instance at module level
+server = create_server()
 
 if __name__ == "__main__":
     exit(main())

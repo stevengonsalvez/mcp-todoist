@@ -59,25 +59,43 @@ class TodoistResources:
             
             # Get tasks
             tasks_iterator = self.api.get_tasks(**kwargs)
-            tasks_list = list(next(tasks_iterator))
+            tasks_list = list(tasks_iterator)
             
             # Convert tasks to dictionaries
-            tasks_data = [
-                {
+            tasks_data = []
+            for task in tasks_list:
+                task_dict = {
                     "id": task.id,
                     "content": task.content,
                     "description": task.description,
                     "url": task.url,
                     "created_at": task.created_at,
                     "priority": task.priority,
-                    "due": task.due.dict() if task.due else None,
                     "project_id": task.project_id,
                     "section_id": task.section_id,
                     "parent_id": task.parent_id,
-                    "label_ids": task.label_ids,
                 }
-                for task in tasks_list
-            ]
+                
+                # Handle labels
+                if hasattr(task, "labels"):
+                    task_dict["labels"] = task.labels
+                elif hasattr(task, "label_ids"):
+                    task_dict["label_ids"] = task.label_ids
+                
+                # Handle due date safely
+                if task.due:
+                    try:
+                        due_dict = {}
+                        for attr in ["date", "string", "is_recurring", "datetime", "timezone"]:
+                            if hasattr(task.due, attr):
+                                due_dict[attr] = getattr(task.due, attr)
+                        task_dict["due"] = due_dict
+                    except Exception:
+                        task_dict["due"] = None
+                else:
+                    task_dict["due"] = None
+                
+                tasks_data.append(task_dict)
             
             # Format as a readable markdown table
             if tasks_data:
