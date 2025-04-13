@@ -214,6 +214,574 @@ def create_server() -> FastMCP:
             ctx=ctx,
         )
     
+    # Add new tools here
+    
+    @server.tool()
+    async def add_task_quick(
+        text: str,
+        ctx: Context = None,
+    ) -> Dict[str, Any]:
+        """
+        Add a task using natural language quick add syntax.
+        
+        Args:
+            text: Text with task details in natural language like "Buy milk tomorrow p1 #shopping"
+            ctx: MCP context (injected automatically)
+            
+        Returns:
+            Dictionary containing task data
+        """
+        return await todoist_tools.add_task_quick(
+            text=text,
+            ctx=ctx,
+        )
+    
+    @server.tool()
+    async def uncomplete_task(
+        task_id: str,
+        ctx: Context = None,
+    ) -> Dict[str, str]:
+        """
+        Uncomplete a task.
+        
+        Args:
+            task_id: ID of the task to uncomplete
+            ctx: MCP context (injected automatically)
+            
+        Returns:
+            Dictionary with status information
+        """
+        return await todoist_tools.uncomplete_task(
+            task_id=task_id,
+            ctx=ctx,
+        )
+    
+    @server.tool()
+    async def get_completed_tasks(
+        since: Optional[str] = None,
+        until: Optional[str] = None,
+        project_id: Optional[str] = None,
+        section_id: Optional[str] = None,
+        ctx: Context = None,
+    ) -> List[Dict[str, Any]]:
+        """
+        Get completed tasks.
+        
+        Args:
+            since: Only return tasks completed on or after this date (YYYY-MM-DD)
+            until: Only return tasks completed before this date (YYYY-MM-DD)
+            project_id: Filter by project ID
+            section_id: Filter by section ID
+            ctx: MCP context (injected automatically)
+            
+        Returns:
+            List of completed task dictionaries
+        """
+        return await todoist_tools.get_completed_tasks(
+            since=since,
+            until=until,
+            project_id=project_id,
+            section_id=section_id,
+            ctx=ctx,
+        )
+    
+    @server.tool()
+    async def add_project(
+        name: str,
+        parent_id: Optional[str] = None,
+        color: Optional[str] = None,
+        is_favorite: Optional[bool] = None,
+        view_style: Optional[str] = None,
+        ctx: Context = None,
+    ) -> Dict[str, Any]:
+        """
+        Create a new project.
+        
+        Args:
+            name: Name of the project
+            parent_id: ID of the parent project for nested projects (optional)
+            color: Color for the project (optional)
+            is_favorite: Whether the project is a favorite (optional)
+            view_style: Style of the project view (optional)
+            ctx: MCP context (injected automatically)
+            
+        Returns:
+            Project dictionary
+        """
+        return await todoist_tools.add_project(
+            name=name,
+            parent_id=parent_id,
+            color=color,
+            is_favorite=is_favorite,
+            view_style=view_style,
+            ctx=ctx,
+        )
+    
+    @server.tool()
+    async def get_project(
+        project_id: str,
+        ctx: Context = None,
+    ) -> Dict[str, Any]:
+        """
+        Get a specific project by ID.
+        
+        Args:
+            project_id: ID of the project to retrieve
+            ctx: MCP context (injected automatically)
+            
+        Returns:
+            Project dictionary
+        """
+        return await todoist_tools.get_project(
+            project_id=project_id,
+            ctx=ctx,
+        )
+    
+    @server.tool()
+    async def update_project(
+        project_id: str,
+        name: Optional[str] = None,
+        color: Optional[str] = None,
+        is_favorite: Optional[bool] = None,
+        view_style: Optional[str] = None,
+        ctx: Context = None,
+    ) -> Dict[str, Any]:
+        """
+        Update an existing project.
+        
+        Args:
+            project_id: ID of the project to update
+            name: New name for the project (optional)
+            color: New color for the project (optional)
+            is_favorite: Whether the project is a favorite (optional)
+            view_style: New style for the project view (optional)
+            ctx: MCP context (injected automatically)
+            
+        Returns:
+            Updated project dictionary
+        """
+        return await todoist_tools.update_project(
+            project_id=project_id,
+            name=name,
+            color=color,
+            is_favorite=is_favorite,
+            view_style=view_style,
+            ctx=ctx,
+        )
+    
+    @server.tool()
+    async def delete_project(
+        project_id: str,
+        ctx: Context = None,
+    ) -> Dict[str, str]:
+        """
+        Delete a project.
+        
+        Args:
+            project_id: ID of the project to delete
+            ctx: MCP context (injected automatically)
+            
+        Returns:
+            Dictionary with status information
+        """
+        return await todoist_tools.delete_project(
+            project_id=project_id,
+            ctx=ctx,
+        )
+    
+    @server.tool()
+    async def archive_project(
+        project_id: str,
+        ctx: Context = None,
+    ) -> Dict[str, str]:
+        """
+        Archive a project.
+        
+        Args:
+            project_id: ID of the project to archive
+            ctx: MCP context (injected automatically)
+            
+        Returns:
+            Dictionary with status information
+        """
+        return await todoist_tools.archive_project(
+            project_id=project_id,
+            ctx=ctx,
+        )
+    
+    @server.tool()
+    async def unarchive_project(
+        project_id: str,
+        ctx: Context = None,
+    ) -> Dict[str, str]:
+        """
+        Unarchive a project.
+        
+        Args:
+            project_id: ID of the project to unarchive
+            ctx: MCP context (injected automatically)
+            
+        Returns:
+            Dictionary with status information
+        """
+        return await todoist_tools.unarchive_project(
+            project_id=project_id,
+            ctx=ctx,
+        )
+    
+    @server.tool()
+    async def get_sections(
+        project_id: Optional[str] = None,
+        ctx: Context = None,
+    ) -> List[Dict[str, Any]]:
+        """
+        Get sections.
+        
+        Args:
+            project_id: Filter by project ID (optional)
+            ctx: MCP context (injected automatically)
+            
+        Returns:
+            List of section dictionaries
+        """
+        return await todoist_tools.get_sections(
+            project_id=project_id,
+            ctx=ctx,
+        )
+    
+    @server.tool()
+    async def get_section(
+        section_id: str,
+        ctx: Context = None,
+    ) -> Dict[str, Any]:
+        """
+        Get a specific section by ID.
+        
+        Args:
+            section_id: ID of the section to retrieve
+            ctx: MCP context (injected automatically)
+            
+        Returns:
+            Section dictionary
+        """
+        return await todoist_tools.get_section(
+            section_id=section_id,
+            ctx=ctx,
+        )
+    
+    @server.tool()
+    async def add_section(
+        name: str,
+        project_id: str,
+        order: Optional[int] = None,
+        ctx: Context = None,
+    ) -> Dict[str, Any]:
+        """
+        Create a new section.
+        
+        Args:
+            name: Name of the section
+            project_id: ID of the project to add the section to
+            order: Order of the section within the project (optional)
+            ctx: MCP context (injected automatically)
+            
+        Returns:
+            Section dictionary
+        """
+        return await todoist_tools.add_section(
+            name=name,
+            project_id=project_id,
+            order=order,
+            ctx=ctx,
+        )
+    
+    @server.tool()
+    async def update_section(
+        section_id: str,
+        name: str,
+        ctx: Context = None,
+    ) -> Dict[str, Any]:
+        """
+        Update an existing section.
+        
+        Args:
+            section_id: ID of the section to update
+            name: New name for the section
+            ctx: MCP context (injected automatically)
+            
+        Returns:
+            Updated section dictionary
+        """
+        return await todoist_tools.update_section(
+            section_id=section_id,
+            name=name,
+            ctx=ctx,
+        )
+    
+    @server.tool()
+    async def delete_section(
+        section_id: str,
+        ctx: Context = None,
+    ) -> Dict[str, str]:
+        """
+        Delete a section.
+        
+        Args:
+            section_id: ID of the section to delete
+            ctx: MCP context (injected automatically)
+            
+        Returns:
+            Dictionary with status information
+        """
+        return await todoist_tools.delete_section(
+            section_id=section_id,
+            ctx=ctx,
+        )
+    
+    @server.tool()
+    async def get_labels(
+        ctx: Context = None,
+    ) -> List[Dict[str, Any]]:
+        """
+        Get all labels.
+        
+        Args:
+            ctx: MCP context (injected automatically)
+            
+        Returns:
+            List of label dictionaries
+        """
+        return await todoist_tools.get_labels(
+            ctx=ctx,
+        )
+    
+    @server.tool()
+    async def get_label(
+        label_id: str,
+        ctx: Context = None,
+    ) -> Dict[str, Any]:
+        """
+        Get a specific label by ID.
+        
+        Args:
+            label_id: ID of the label to retrieve
+            ctx: MCP context (injected automatically)
+            
+        Returns:
+            Label dictionary
+        """
+        return await todoist_tools.get_label(
+            label_id=label_id,
+            ctx=ctx,
+        )
+    
+    @server.tool()
+    async def add_label(
+        name: str,
+        color: Optional[str] = None,
+        favorite: Optional[bool] = None,
+        ctx: Context = None,
+    ) -> Dict[str, Any]:
+        """
+        Create a new label.
+        
+        Args:
+            name: Name of the label
+            color: Color for the label (optional)
+            favorite: Whether the label is a favorite (optional)
+            ctx: MCP context (injected automatically)
+            
+        Returns:
+            Label dictionary
+        """
+        return await todoist_tools.add_label(
+            name=name,
+            color=color,
+            favorite=favorite,
+            ctx=ctx,
+        )
+    
+    @server.tool()
+    async def update_label(
+        label_id: str,
+        name: Optional[str] = None,
+        color: Optional[str] = None,
+        favorite: Optional[bool] = None,
+        ctx: Context = None,
+    ) -> Dict[str, Any]:
+        """
+        Update an existing label.
+        
+        Args:
+            label_id: ID of the label to update
+            name: New name for the label (optional)
+            color: New color for the label (optional)
+            favorite: Whether the label is a favorite (optional)
+            ctx: MCP context (injected automatically)
+            
+        Returns:
+            Updated label dictionary
+        """
+        return await todoist_tools.update_label(
+            label_id=label_id,
+            name=name,
+            color=color,
+            favorite=favorite,
+            ctx=ctx,
+        )
+    
+    @server.tool()
+    async def delete_label(
+        label_id: str,
+        ctx: Context = None,
+    ) -> Dict[str, str]:
+        """
+        Delete a label.
+        
+        Args:
+            label_id: ID of the label to delete
+            ctx: MCP context (injected automatically)
+            
+        Returns:
+            Dictionary with status information
+        """
+        return await todoist_tools.delete_label(
+            label_id=label_id,
+            ctx=ctx,
+        )
+    
+    @server.tool()
+    async def get_comments(
+        task_id: Optional[str] = None,
+        project_id: Optional[str] = None,
+        ctx: Context = None,
+    ) -> List[Dict[str, Any]]:
+        """
+        Get comments for a task or project.
+        
+        Args:
+            task_id: ID of the task to get comments for (optional)
+            project_id: ID of the project to get comments for (optional)
+            ctx: MCP context (injected automatically)
+            
+        Returns:
+            List of comment dictionaries
+        """
+        return await todoist_tools.get_comments(
+            task_id=task_id,
+            project_id=project_id,
+            ctx=ctx,
+        )
+    
+    @server.tool()
+    async def get_comment(
+        comment_id: str,
+        ctx: Context = None,
+    ) -> Dict[str, Any]:
+        """
+        Get a specific comment by ID.
+        
+        Args:
+            comment_id: ID of the comment to retrieve
+            ctx: MCP context (injected automatically)
+            
+        Returns:
+            Comment dictionary
+        """
+        return await todoist_tools.get_comment(
+            comment_id=comment_id,
+            ctx=ctx,
+        )
+    
+    @server.tool()
+    async def add_comment(
+        content: str,
+        task_id: Optional[str] = None,
+        project_id: Optional[str] = None,
+        ctx: Context = None,
+    ) -> Dict[str, Any]:
+        """
+        Add a comment to a task or project.
+        
+        Args:
+            content: Content of the comment
+            task_id: ID of the task to add comment to (optional)
+            project_id: ID of the project to add comment to (optional)
+            ctx: MCP context (injected automatically)
+            
+        Returns:
+            Comment dictionary
+        """
+        return await todoist_tools.add_comment(
+            content=content,
+            task_id=task_id,
+            project_id=project_id,
+            ctx=ctx,
+        )
+    
+    @server.tool()
+    async def update_comment(
+        comment_id: str,
+        content: str,
+        ctx: Context = None,
+    ) -> Dict[str, Any]:
+        """
+        Update an existing comment.
+        
+        Args:
+            comment_id: ID of the comment to update
+            content: New content for the comment
+            ctx: MCP context (injected automatically)
+            
+        Returns:
+            Updated comment dictionary
+        """
+        return await todoist_tools.update_comment(
+            comment_id=comment_id,
+            content=content,
+            ctx=ctx,
+        )
+    
+    @server.tool()
+    async def delete_comment(
+        comment_id: str,
+        ctx: Context = None,
+    ) -> Dict[str, str]:
+        """
+        Delete a comment.
+        
+        Args:
+            comment_id: ID of the comment to delete
+            ctx: MCP context (injected automatically)
+            
+        Returns:
+            Dictionary with status information
+        """
+        return await todoist_tools.delete_comment(
+            comment_id=comment_id,
+            ctx=ctx,
+        )
+    
+    @server.tool()
+    async def get_collaborators(
+        project_id: str,
+        ctx: Context = None,
+    ) -> List[Dict[str, Any]]:
+        """
+        Get collaborators for a project.
+        
+        Args:
+            project_id: ID of the project to get collaborators for
+            ctx: MCP context (injected automatically)
+            
+        Returns:
+            List of collaborator dictionaries
+        """
+        return await todoist_tools.get_collaborators(
+            project_id=project_id,
+            ctx=ctx,
+        )
+    
     # Register Todoist resources
     
     @server.resource("todoist://tasks")
