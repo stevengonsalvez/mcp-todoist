@@ -444,38 +444,6 @@ class TodoistTools:
     
     # New methods below
     
-    async def add_task_quick(
-        self,
-        text: str,
-        ctx: Optional[Context] = None,
-    ) -> Dict[str, Any]:
-        """
-        Add a task using natural language quick add syntax.
-        
-        Args:
-            text: Text with task details in natural language
-            ctx: MCP context (optional)
-            
-        Returns:
-            Task dictionary
-        """
-        if ctx:
-            ctx.info(f"Quick adding Todoist task: {text}")
-        
-        try:
-            import asyncio
-            loop = asyncio.get_event_loop()
-            
-            task = await loop.run_in_executor(
-                None,
-                lambda: self.api.add_task_quick(text)
-            )
-            return self._task_to_dict(task)
-        except Exception as e:
-            if ctx:
-                ctx.error(f"Failed to quick add Todoist task: {str(e)}")
-            raise ValueError(f"Failed to quick add Todoist task: {str(e)}")
-    
     async def uncomplete_task(
         self,
         task_id: str,
