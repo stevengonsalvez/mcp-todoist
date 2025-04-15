@@ -115,7 +115,6 @@ The following Todoist tools are available:
 - `complete_task` - Mark a task as complete
 - `uncomplete_task` - Mark a completed task as incomplete
 - `delete_task` - Delete a task
-- `get_completed_tasks` - Get completed tasks by date range
 
 ### Project Management
 - `get_projects` - Get all projects
