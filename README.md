@@ -207,4 +207,4 @@ To contribute to the project or modify it for your needs:
 
 ## License
 
-MIT
+This project is licensed under the [MIT License](LICENSE). See the [LICENSE](LICENSE) file for details.
