@@ -36,7 +36,6 @@ class TodoistTools:
         project_id: Optional[str] = None,
         section_id: Optional[str] = None,
         labels: Optional[List[str]] = None,
-        label_ids: Optional[List[str]] = None,
         parent_id: Optional[str] = None,
         assignee_id: Optional[str] = None,
         day_order: Optional[int] = None,
@@ -56,7 +55,6 @@ class TodoistTools:
             project_id: ID of the project to add the task to (optional)
             section_id: ID of the section to add the task to (optional)
             labels: List of label names to apply to the task (optional)
-            label_ids: List of label IDs to apply to the task (optional)
             parent_id: ID of the parent task for subtasks (optional)
             assignee_id: User ID to whom the task is assigned (optional)
             day_order: Task order in Today or Next 7 days view (optional)
@@ -89,8 +87,6 @@ class TodoistTools:
             task_data["section_id"] = section_id
         if labels is not None:
             task_data["labels"] = labels
-        if label_ids is not None:
-            task_data["label_ids"] = label_ids
         if parent_id is not None:
             task_data["parent_id"] = parent_id
         if assignee_id is not None:
@@ -98,17 +94,58 @@ class TodoistTools:
         if day_order is not None:
             task_data["day_order"] = day_order
         
+        if ctx:
+            ctx.info(f"Task data prepared: {task_data}")
+        
+        # Use a more direct approach to create the task - 404 
         try:
-            # Create the task in Todoist
-            task = self.api.add_task(**task_data)
+            # Try two methods
             
-            # Return task data using helper method
-            return self._task_to_dict(task)
-        except Exception as e:
-            # Log error if context is provided
+            # Method 1: Create a new instance of the API just for this call
+            fresh_api = TodoistAPI(self.api._token)
+            task = fresh_api.add_task(**task_data)
+            
             if ctx:
-                ctx.error(f"Failed to create Todoist task: {str(e)}")
-            raise ValueError(f"Failed to create Todoist task: {str(e)}")
+                ctx.info(f"Task created successfully: {task.id}")
+            
+            return self._task_to_dict(task)
+        except Exception as e1:
+            if ctx:
+                ctx.error(f"First method failed: {str(e1)}")
+            
+            # Method 2: If first approach fails, try with direct HTTP request
+            try:
+                import aiohttp
+                import json
+                
+                url = "https://api.todoist.com/rest/v2/tasks"
+                headers = {
+                    "Authorization": f"Bearer {self.api._token}",
+                    "Content-Type": "application/json",
+                }
+                
+                if ctx:
+                    ctx.info(f"Attempting direct API call to {url}")
+                
+                async with aiohttp.ClientSession() as session:
+                    async with session.post(url, headers=headers, json=task_data) as response:
+                        if response.status != 200:
+                            error_text = await response.text()
+                            raise ValueError(f"API error: {response.status} - {error_text}")
+                        
+                        task_json = await response.json()
+                        
+                        if ctx:
+                            ctx.info(f"Task created successfully via direct API: {task_json.get('id')}")
+                        
+                        # Convert to same format as the SDK would return
+                        from todoist_api_python.models import Task
+                        task = Task.from_dict(task_json)
+                        return self._task_to_dict(task)
+            except Exception as e2:
+                if ctx:
+                    ctx.error(f"Both methods failed. Direct API error: {str(e2)}")
+                raise ValueError(f"Failed to create Todoist task: {str(e1)}. Direct API error: {str(e2)}")
     
     async def get_tasks(
         self,
@@ -136,9 +173,15 @@ class TodoistTools:
             ctx.info("Fetching Todoist tasks")
         
         try:
+            import asyncio
+            loop = asyncio.get_event_loop()
+            
             if filter_query:
                 # Use filter query if provided
-                tasks_list = list(self.api.filter_tasks(query=filter_query))
+                tasks_list = await loop.run_in_executor(
+                    None,
+                    lambda: list(self.api.filter_tasks(query=filter_query))
+                )
             else:
                 # Otherwise use the get_tasks method with provided filters
                 kwargs = {}
@@ -149,7 +192,10 @@ class TodoistTools:
                 if label:
                     kwargs["label"] = label
                 
-                tasks_list = list(self.api.get_tasks(**kwargs))
+                tasks_list = await loop.run_in_executor(
+                    None,
+                    lambda: list(self.api.get_tasks(**kwargs))
+                )
             
             # Convert tasks to dictionaries using the helper method
             return [self._task_to_dict(task) for task in tasks_list]
@@ -179,8 +225,14 @@ class TodoistTools:
             ctx.info(f"Fetching Todoist task: {task_id}")
         
         try:
+            import asyncio
+            loop = asyncio.get_event_loop()
+            
             # Get the task by ID
-            task = self.api.get_task(task_id)
+            task = await loop.run_in_executor(
+                None,
+                lambda: self.api.get_task(task_id)
+            )
             
             # Return task data as dictionary using the helper method
             return self._task_to_dict(task)
@@ -230,7 +282,7 @@ class TodoistTools:
             ctx.info(f"Updating Todoist task: {task_id}")
         
         # Prepare update data with only non-None values
-        update_data = {"id": task_id}
+        update_data = {}
         if content is not None:
             update_data["content"] = content
         if description is not None:
@@ -252,13 +304,19 @@ class TodoistTools:
         if day_order is not None:
             update_data["day_order"] = day_order
         
-        # If only ID is provided, nothing to update
-        if len(update_data) == 1:
+        # If no update data provided, nothing to update
+        if len(update_data) == 0:
             raise ValueError("No update data provided")
         
         try:
-            # Update the task
-            success = self.api.update_task(**update_data)
+            import asyncio
+            loop = asyncio.get_event_loop()
+            
+            # Update the task - pass task_id as first positional argument
+            success = await loop.run_in_executor(
+                None,
+                lambda: self.api.update_task(task_id, **update_data)
+            )
             
             if not success:
                 raise ValueError("Failed to update task")
@@ -405,7 +463,13 @@ class TodoistTools:
             ctx.info(f"Quick adding Todoist task: {text}")
         
         try:
-            task = self.api.add_task_quick(text)
+            import asyncio
+            loop = asyncio.get_event_loop()
+            
+            task = await loop.run_in_executor(
+                None,
+                lambda: self.api.add_task_quick(text)
+            )
             return self._task_to_dict(task)
         except Exception as e:
             if ctx:
@@ -1154,8 +1218,8 @@ class TodoistTools:
         # Handle labels
         if hasattr(task, "labels"):
             task_dict["labels"] = task.labels
-        elif hasattr(task, "label_ids"):
-            task_dict["label_ids"] = task.label_ids
+        else:
+            task_dict["labels"] = []
         
         return task_dict
     

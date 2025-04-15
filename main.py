@@ -53,7 +53,6 @@ def create_server() -> FastMCP:
         project_id: Optional[str] = None,
         section_id: Optional[str] = None,
         labels: Optional[List[str]] = None,
-        label_ids: Optional[List[str]] = None,
         parent_id: Optional[str] = None,
         assignee_id: Optional[str] = None,
         day_order: Optional[int] = None,
@@ -73,7 +72,6 @@ def create_server() -> FastMCP:
             project_id: ID of the project to add the task to (optional)
             section_id: ID of the section to add the task to (optional)
             labels: List of label names to apply to the task (optional)
-            label_ids: List of label IDs to apply to the task (optional)
             parent_id: ID of the parent task for subtasks (optional)
             assignee_id: User ID to whom the task is assigned (optional)
             day_order: Task order in Today or Next 7 days view (optional)
@@ -93,7 +91,6 @@ def create_server() -> FastMCP:
             project_id=project_id,
             section_id=section_id,
             labels=labels,
-            label_ids=label_ids,
             parent_id=parent_id,
             assignee_id=assignee_id,
             day_order=day_order,
