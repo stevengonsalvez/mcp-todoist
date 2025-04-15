@@ -59,15 +59,16 @@ To run with the MCP Inspector for visual interaction:
 mcp dev main.py
 ```
 
-
-
 ### Using with Claude Desktop
 
-To use this MCP server with Claude Desktop:
+To use this MCP server with Claude Desktop, you have two options:
 
-1. Install the server:
-   - If published to PyPI: `pip install mcp-todoist`
-   - If cloned: Follow the installation instructions above
+#### Option 1: If you've cloned the repository
+
+1. Install the package in development mode:
+   ```bash
+   pip install -e .
+   ```
 
 2. Add the server to Claude Desktop's MCP configuration:
    - Open Claude Desktop
@@ -76,20 +77,23 @@ To use this MCP server with Claude Desktop:
      ```json
      "mcpServers": {
        "todoist": {
-         "command": "mcp-todoist"
+         "command": "python",
+         "args": ["/full/path/to/mcp-todoist/main.py"]
        }
      }
      ```
-   - Or if using the cloned repository:
-     ```json
-     "mcpServers": {
-       "todoist": {
-         "command": "mcp",
-         "args": ["run", "/path/to/mcp-todoist/main.py"]
-       }
-     }
-     ```
-   - If you're using uvx or uv for package management:
+
+#### Option 2: Using uvx
+
+1. Install the package using uvx:
+   ```bash
+   uvx install mcp-todoist
+   ```
+
+2. Add the server to Claude Desktop's MCP configuration:
+   - Open Claude Desktop
+   - Go to Settings > Advanced
+   - Under "MCP Servers Configuration", add to the JSON configuration:
      ```json
      "mcpServers": {
        "todoist": {
