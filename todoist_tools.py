@@ -125,8 +125,7 @@ class TodoistTools:
         try:
             if filter_query:
                 # Use filter query if provided
-                tasks_iterator = self.api.filter_tasks(query=filter_query)
-                tasks_list = list(next(tasks_iterator))
+                tasks_list = list(self.api.filter_tasks(query=filter_query))
             else:
                 # Otherwise use the get_tasks method with provided filters
                 kwargs = {}
@@ -137,26 +136,10 @@ class TodoistTools:
                 if label:
                     kwargs["label"] = label
                 
-                tasks_iterator = self.api.get_tasks(**kwargs)
-                tasks_list = list(next(tasks_iterator))
+                tasks_list = list(self.api.get_tasks(**kwargs))
             
-            # Convert tasks to dictionaries
-            return [
-                {
-                    "id": task.id,
-                    "content": task.content,
-                    "description": task.description,
-                    "url": task.url,
-                    "created_at": task.created_at,
-                    "priority": task.priority,
-                    "due": task.due.dict() if task.due else None,
-                    "project_id": task.project_id,
-                    "section_id": task.section_id,
-                    "parent_id": task.parent_id,
-                    "label_ids": task.label_ids,
-                }
-                for task in tasks_list
-            ]
+            # Convert tasks to dictionaries using the helper method
+            return [self._task_to_dict(task) for task in tasks_list]
         except Exception as e:
             # Log error if context is provided
             if ctx:
@@ -186,20 +169,8 @@ class TodoistTools:
             # Get the task by ID
             task = self.api.get_task(task_id)
             
-            # Return task data as dictionary
-            return {
-                "id": task.id,
-                "content": task.content,
-                "description": task.description,
-                "url": task.url,
-                "created_at": task.created_at,
-                "priority": task.priority,
-                "due": task.due.dict() if task.due else None,
-                "project_id": task.project_id,
-                "section_id": task.section_id,
-                "parent_id": task.parent_id,
-                "label_ids": task.label_ids,
-            }
+            # Return task data as dictionary using the helper method
+            return self._task_to_dict(task)
         except Exception as e:
             # Log error if context is provided
             if ctx:
