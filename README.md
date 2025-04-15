@@ -108,7 +108,6 @@ The following Todoist tools are available:
 
 ### Task Management
 - `create_task` - Create a new task with title, due date, project, etc.
-- `add_task_quick` - Quickly add a task using natural language
 - `get_tasks` - Get tasks based on filters
 - `get_task` - Get a specific task by ID
 - `update_task` - Update an existing task

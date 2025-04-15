@@ -256,26 +256,6 @@ def create_server() -> FastMCP:
     # Add new tools here
     
     @server.tool()
-    async def add_task_quick(
-        text: str,
-        ctx: Context = None,
-    ) -> Dict[str, Any]:
-        """
-        Add a task using natural language quick add syntax.
-        
-        Args:
-            text: Text with task details in natural language like "Buy milk tomorrow p1 #shopping"
-            ctx: MCP context (injected automatically)
-            
-        Returns:
-            Dictionary containing task data
-        """
-        return await todoist_tools.add_task_quick(
-            text=text,
-            ctx=ctx,
-        )
-    
-    @server.tool()
     async def uncomplete_task(
         task_id: str,
         ctx: Context = None,
