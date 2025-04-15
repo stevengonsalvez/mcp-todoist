@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Optional
 
 from mcp.server.fastmcp import Context
 from todoist_api_python.api import TodoistAPI
+from datetime import datetime, timedelta
 
 
 class TodoistTools:
@@ -28,11 +29,17 @@ class TodoistTools:
         content: str, 
         description: Optional[str] = None,
         due_string: Optional[str] = None,
+        due_date: Optional[str] = None,
+        due_datetime: Optional[str] = None,
+        due_lang: Optional[str] = None,
         priority: Optional[int] = None,
         project_id: Optional[str] = None,
         section_id: Optional[str] = None,
+        labels: Optional[List[str]] = None,
         label_ids: Optional[List[str]] = None,
         parent_id: Optional[str] = None,
+        assignee_id: Optional[str] = None,
+        day_order: Optional[int] = None,
         ctx: Optional[Context] = None,
     ) -> Dict[str, Any]:
         """
@@ -42,11 +49,17 @@ class TodoistTools:
             content: The content/title of the task
             description: Detailed description of the task (optional)
             due_string: Natural language due date like 'tomorrow', 'next Monday' (optional)
+            due_date: Due date in YYYY-MM-DD format (optional)
+            due_datetime: Due date with time in RFC3339 format (optional)
+            due_lang: Language for parsing due_string, e.g., 'en', 'fr' (optional)
             priority: Task priority from 1 (normal) to 4 (urgent) (optional)
             project_id: ID of the project to add the task to (optional)
             section_id: ID of the section to add the task to (optional)
+            labels: List of label names to apply to the task (optional)
             label_ids: List of label IDs to apply to the task (optional)
             parent_id: ID of the parent task for subtasks (optional)
+            assignee_id: User ID to whom the task is assigned (optional)
+            day_order: Task order in Today or Next 7 days view (optional)
             ctx: MCP context (optional)
             
         Returns:
@@ -62,35 +75,35 @@ class TodoistTools:
             task_data["description"] = description
         if due_string is not None:
             task_data["due_string"] = due_string
+        if due_date is not None:
+            task_data["due_date"] = due_date
+        if due_datetime is not None:
+            task_data["due_datetime"] = due_datetime
+        if due_lang is not None:
+            task_data["due_lang"] = due_lang
         if priority is not None:
             task_data["priority"] = priority
         if project_id is not None:
             task_data["project_id"] = project_id
         if section_id is not None:
             task_data["section_id"] = section_id
+        if labels is not None:
+            task_data["labels"] = labels
         if label_ids is not None:
             task_data["label_ids"] = label_ids
         if parent_id is not None:
             task_data["parent_id"] = parent_id
+        if assignee_id is not None:
+            task_data["assignee_id"] = assignee_id
+        if day_order is not None:
+            task_data["day_order"] = day_order
         
         try:
             # Create the task in Todoist
             task = self.api.add_task(**task_data)
             
-            # Return task data as dictionary
-            return {
-                "id": task.id,
-                "content": task.content,
-                "description": task.description,
-                "url": task.url,
-                "created_at": task.created_at,
-                "priority": task.priority,
-                "due": task.due.dict() if task.due else None,
-                "project_id": task.project_id,
-                "section_id": task.section_id,
-                "parent_id": task.parent_id,
-                "label_ids": task.label_ids,
-            }
+            # Return task data using helper method
+            return self._task_to_dict(task)
         except Exception as e:
             # Log error if context is provided
             if ctx:
@@ -183,7 +196,13 @@ class TodoistTools:
         content: Optional[str] = None,
         description: Optional[str] = None,
         due_string: Optional[str] = None,
+        due_date: Optional[str] = None,
+        due_datetime: Optional[str] = None,
+        due_lang: Optional[str] = None,
         priority: Optional[int] = None,
+        labels: Optional[List[str]] = None,
+        assignee_id: Optional[str] = None,
+        day_order: Optional[int] = None,
         ctx: Optional[Context] = None,
     ) -> Dict[str, Any]:
         """
@@ -194,7 +213,13 @@ class TodoistTools:
             content: New task content/title (optional)
             description: New task description (optional)
             due_string: New due date in natural language (optional)
-            priority: New priority level (optional)
+            due_date: New due date in YYYY-MM-DD format (optional)
+            due_datetime: New due date with time in RFC3339 format (optional)
+            due_lang: Language for parsing due_string, e.g., 'en', 'fr' (optional)
+            priority: New priority level from 1 (normal) to 4 (urgent) (optional)
+            labels: List of label names to apply to the task (optional)
+            assignee_id: User ID to whom the task is assigned (optional)
+            day_order: Task order in Today or Next 7 days view (optional)
             ctx: MCP context (optional)
             
         Returns:
@@ -212,8 +237,20 @@ class TodoistTools:
             update_data["description"] = description
         if due_string is not None:
             update_data["due_string"] = due_string
+        if due_date is not None:
+            update_data["due_date"] = due_date
+        if due_datetime is not None:
+            update_data["due_datetime"] = due_datetime
+        if due_lang is not None:
+            update_data["due_lang"] = due_lang
         if priority is not None:
             update_data["priority"] = priority
+        if labels is not None:
+            update_data["labels"] = labels
+        if assignee_id is not None:
+            update_data["assignee_id"] = assignee_id
+        if day_order is not None:
+            update_data["day_order"] = day_order
         
         # If only ID is provided, nothing to update
         if len(update_data) == 1:
@@ -381,67 +418,35 @@ class TodoistTools:
         ctx: Optional[Context] = None,
     ) -> Dict[str, str]:
         """
-        Uncomplete a task.
+        Reopen a completed task.
         
         Args:
-            task_id: ID of the task to uncomplete
+            task_id: ID of the task to reopen
             ctx: MCP context (optional)
             
         Returns:
             Dictionary with status information
         """
+        # Log action if context is provided
         if ctx:
-            ctx.info(f"Uncompleting Todoist task: {task_id}")
+            ctx.info(f"Reopening Todoist task: {task_id}")
         
         try:
-            self.api.uncomplete_task(task_id)
-            return {"status": "success", "message": f"Task {task_id} uncompleted"}
-        except Exception as e:
-            if ctx:
-                ctx.error(f"Failed to uncomplete Todoist task: {str(e)}")
-            raise ValueError(f"Failed to uncomplete Todoist task: {str(e)}")
-    
-    async def get_completed_tasks(
-        self,
-        since: Optional[str] = None,
-        until: Optional[str] = None,
-        project_id: Optional[str] = None,
-        section_id: Optional[str] = None,
-        ctx: Optional[Context] = None,
-    ) -> List[Dict[str, Any]]:
-        """
-        Get completed tasks.
-        
-        Args:
-            since: Only return tasks completed on or after this date (YYYY-MM-DD)
-            until: Only return tasks completed before this date (YYYY-MM-DD)
-            project_id: Filter by project ID
-            section_id: Filter by section ID
-            ctx: MCP context (optional)
+            # Reopen the task
+            success = self.api.reopen_task(task_id)
             
-        Returns:
-            List of completed task dictionaries
-        """
-        if ctx:
-            ctx.info("Fetching completed Todoist tasks")
-        
-        try:
-            kwargs = {}
-            if since:
-                kwargs["since"] = since
-            if until:
-                kwargs["until"] = until
-            if project_id:
-                kwargs["project_id"] = project_id
-            if section_id:
-                kwargs["section_id"] = section_id
+            if not success:
+                raise ValueError(f"Failed to reopen task {task_id}")
             
-            tasks = self.api.get_completed_tasks(**kwargs)
-            return [self._task_to_dict(task) for task in tasks]
+            return {
+                "status": "success",
+                "message": f"Task {task_id} reopened successfully",
+            }
         except Exception as e:
+            # Log error if context is provided
             if ctx:
-                ctx.error(f"Failed to get completed Todoist tasks: {str(e)}")
-            raise ValueError(f"Failed to get completed Todoist tasks: {str(e)}")
+                ctx.error(f"Failed to reopen Todoist task: {str(e)}")
+            raise ValueError(f"Failed to reopen Todoist task: {str(e)}")
     
     async def add_project(
         self,
