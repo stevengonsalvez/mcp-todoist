@@ -1,7 +1,3 @@
-[build-system]
-requires = ["setuptools>=42", "wheel", "setuptools_scm[toml]>=6.0"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "mcp-todoist"
 description = "Todoist integration for MCP"
@@ -12,6 +8,10 @@ dynamic = ["version"]
 authors = [
     {name = "steven gonsalvez", email = "steven.gonsalvez@gmail.com"},
 ]
+
+[build-system]
+requires = ["setuptools>=42", "wheel", "setuptools_scm[toml]>=6.0"]
+build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
 # Use pure semantic versioning (no "v" prefix in git tags)
