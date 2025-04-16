@@ -1,0 +1,110 @@
+name: Build and Publish
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+*'
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Release type (test or prod)'
+        required: true
+        default: 'test'
+        type: choice
+        options:
+          - test
+          - prod
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Required for setuptools_scm to determine version from git
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest black isort
+        pip install -e .
+    
+    - name: Lint with flake8
+      run: |
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=.venv,venv,env,.git,__pycache__,build,dist
+    
+    - name: Check format with black
+      run: |
+        black --check --exclude="/(\.venv|venv|env|\.git|__pycache__|build|dist)/" .
+    
+    - name: Check imports with isort
+      run: |
+        isort --check-only --profile black --skip .venv --skip venv --skip env --skip .git --skip __pycache__ --skip build --skip dist .
+    
+    - name: Test with pytest
+      run: |
+        pytest
+
+  build-and-publish:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Required for setuptools_scm to determine version from git
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.12"
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build twine
+    
+    - name: Build package
+      run: |
+        python -m build
+    
+    - name: Generate changelog
+      id: github_release
+      uses: mikepenz/release-changelog-builder-action@v4
+      with:
+        configuration: ".github/changelog-config.json"
+        ignorePreReleases: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Create GitHub Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        body: |
+          # Changelog
+          ${{ steps.github_release.outputs.changelog }}
+        files: dist/*
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Publish to Test PyPI
+      if: github.event_name == 'workflow_dispatch' && github.event.inputs.release_type == 'test'
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        repository-url: https://test.pypi.org/legacy/
+    
+    - name: Publish to PyPI
+      if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) || (github.event_name == 'workflow_dispatch' && github.event.inputs.release_type == 'prod')
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        password: ${{ secrets.PYPI_API_TOKEN }} 
