@@ -207,24 +207,31 @@ To contribute to the project or modify it for your needs:
 
 ### Publishing to PyPI
 
-This project is set up with a GitHub Actions workflow for automatic publishing to PyPI:
+This project uses `setuptools_scm` for automatic versioning based on git tags:
 
 1. Ensure all tests pass locally:
    ```bash
-   pip install flake8 pytest black isort
+   pip install -e ".[dev]"
    flake8 . --exclude=.venv,venv,env
    black --check .
    isort --check-only --profile black .
    pytest
    ```
 
-2. Update the version in `setup.py` following [Semantic Versioning](https://semver.org/).
+2. Create a new release with semantic versioning (no "v" prefix):
+   ```bash
+   # For a new version (e.g., 0.1.0)
+   git tag 0.1.0
+   git push origin 0.1.0
+   ```
 
-3. Publishing automatically via GitHub:
-   - Tag a release: `git tag v0.1.0 && git push origin v0.1.0`
-   - This will trigger the workflow to publish to PyPI
+3. The GitHub Actions workflow will automatically:
+   - Run tests
+   - Generate a changelog from PRs and commits
+   - Create a GitHub release with the changelog
+   - Build and publish the package to PyPI
 
-4. Publishing manually:
+4. Publishing manually (if needed):
    ```bash
    pip install build twine
    python -m build
