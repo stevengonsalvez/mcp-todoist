@@ -205,6 +205,39 @@ To contribute to the project or modify it for your needs:
 3. Test with `mcp run main.py` or `mcp dev main.py`
 4. Submit a pull request
 
+### Publishing to PyPI
+
+This project is set up with a GitHub Actions workflow for automatic publishing to PyPI:
+
+1. Ensure all tests pass locally:
+   ```bash
+   pip install flake8 pytest black isort
+   flake8 . --exclude=.venv,venv,env
+   black --check .
+   isort --check-only --profile black .
+   pytest
+   ```
+
+2. Update the version in `setup.py` following [Semantic Versioning](https://semver.org/).
+
+3. Publishing automatically via GitHub:
+   - Tag a release: `git tag v0.1.0 && git push origin v0.1.0`
+   - This will trigger the workflow to publish to PyPI
+
+4. Publishing manually:
+   ```bash
+   pip install build twine
+   python -m build
+   twine check dist/*
+   twine upload --repository-url https://test.pypi.org/legacy/ dist/*  # Test first
+   twine upload dist/*  # Then to production PyPI
+   ```
+
+5. Alternative: Trigger manual workflow:
+   - Go to the GitHub repository → Actions → "Build and Publish" workflow
+   - Click "Run workflow"
+   - Choose "test" for Test PyPI or "prod" for production PyPI
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE). See the [LICENSE](LICENSE) file for details.
