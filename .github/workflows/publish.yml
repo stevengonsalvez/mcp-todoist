@@ -3,7 +3,7 @@ name: Build and Publish
 on:
   push:
     tags:
-      - 'v*'
+      - '[0-9]+.[0-9]+.[0-9]+*'
   workflow_dispatch:
     inputs:
       release_type:
@@ -24,6 +24,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Required for setuptools_scm to determine version from git
+    
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
@@ -56,6 +59,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Required for setuptools_scm to determine version from git
+    
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
@@ -70,6 +76,26 @@ jobs:
       run: |
         python -m build
     
+    - name: Generate changelog
+      id: github_release
+      uses: mikepenz/release-changelog-builder-action@v4
+      with:
+        configuration: ".github/changelog-config.json"
+        ignorePreReleases: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Create GitHub Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        body: |
+          # Changelog
+          ${{ steps.github_release.outputs.changelog }}
+        files: dist/*
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
     - name: Publish to Test PyPI
       if: github.event_name == 'workflow_dispatch' && github.event.inputs.release_type == 'test'
       uses: pypa/gh-action-pypi-publish@release/v1
@@ -78,7 +104,7 @@ jobs:
         repository-url: https://test.pypi.org/legacy/
     
     - name: Publish to PyPI
-      if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) || (github.event_name == 'workflow_dispatch' && github.event.inputs.release_type == 'prod')
+      if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) || (github.event_name == 'workflow_dispatch' && github.event.inputs.release_type == 'prod')
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         password: ${{ secrets.PYPI_API_TOKEN }} 

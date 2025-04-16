@@ -8,13 +8,13 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="mcp-todoist",
-    version="0.1.0",
+    use_scm_version=True,
     author="",
     author_email="",
     description="Model Context Protocol (MCP) server for Todoist integration",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/your-username/mcp-todoist",
+    url="https://github.com/stevengonsalvez/mcp-todoist",
     packages=find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
