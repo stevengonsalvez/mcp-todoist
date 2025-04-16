@@ -1,3 +1,14 @@
+[project]
+name = "mcp-todoist"
+description = "Todoist integration for MCP"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+dynamic = ["version"]
+authors = [
+    {name = "steven gonsalvez", email = "steven.gonsalvez@gmail.com"},
+]
+
 [build-system]
 requires = ["setuptools>=42", "wheel", "setuptools_scm[toml]>=6.0"]
 build-backend = "setuptools.build_meta"
@@ -15,4 +26,4 @@ profile = "black"
 line_length = 88
 
 [tool.pytest]
-testpaths = ["tests"] 
+testpaths = ["tests"]

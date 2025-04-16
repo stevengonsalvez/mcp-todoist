@@ -68,6 +68,47 @@ To use this MCP server with Claude Desktop, you have two options:
      }
      ```
 
+### Option 3: Using uv
+
+uv is a fast Python package installer and resolver. To use it with this project:
+
+1. First make sure you have uv installed:
+   ```bash
+   # Install uv (if you haven't already)
+   brew install uv  # On macOS with Homebrew
+   pipx install uv  # Or use pipx
+   ```
+
+2. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/mcp-todoist.git
+   cd mcp-todoist
+   ```
+
+3. Create and maintain the lock file:
+   ```bash
+   # Create/update the lock file (do this when dependencies change)
+   uv pip sync requirements.txt
+   ```
+
+4. Run the MCP server using uv:
+   ```bash
+   uv run mcp dev main.py
+   ```
+
+5. Configure Claude Desktop:
+   ```json
+   "mcpServers": {
+     "todoist": {
+       "command": "uv",
+       "args": ["run", "mcp", "dev", "/full/path/to/mcp-todoist/main.py"],
+       "env": {
+         "TODOIST_API_TOKEN": "your_todoist_api_token_here"
+       }
+     }
+   }
+   ```
+
 3. Save the configuration and restart Claude Desktop
 
 4. You can now access the Todoist MCP server in your Claude conversations by asking Claude to use Todoist
@@ -215,6 +256,30 @@ To contribute to the project or modify it for your needs:
 2. Make your changes
 3. Test with `mcp run main.py` or `mcp dev main.py`
 4. Submit a pull request
+
+### Using uv for Development
+
+This project supports using `uv` for faster dependency management and running:
+
+1. Create/update the lock file when dependencies change:
+   ```bash
+   uv pip sync requirements.txt
+   ```
+
+2. Run the application with uv:
+   ```bash
+   uv run mcp dev main.py
+   ```
+
+3. If you're experiencing lock file issues, you can troubleshoot by:
+   ```bash
+   # Remove the lock file and regenerate it
+   rm uv.lock
+   uv pip sync requirements.txt
+
+   # Or run without using the lock file (temporary solution)
+   UV_LOCK=0 uv run mcp dev main.py
+   ```
 
 ### Git Hooks
 

@@ -5,7 +5,6 @@ This module defines the MCP tools that allow language models to interact
 with Todoist data and functionality.
 """
 
-from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
 from mcp.server.fastmcp import Context
@@ -47,7 +46,8 @@ class TodoistTools:
         Args:
             content: The content/title of the task
             description: Detailed description of the task (optional)
-            due_string: Natural language due date like 'tomorrow', 'next Monday' (optional)
+            due_string: Natural language due date like 'tomorrow', 'next Monday'
+                (optional)
             due_date: Due date in YYYY-MM-DD format (optional)
             due_datetime: Due date with time in RFC3339 format (optional)
             due_lang: Language for parsing due_string, e.g., 'en', 'fr' (optional)
@@ -115,8 +115,6 @@ class TodoistTools:
 
             # Method 2: If first approach fails, try with direct HTTP request
             try:
-                import json
-
                 import aiohttp
 
                 url = "https://api.todoist.com/rest/v2/tasks"
@@ -142,7 +140,8 @@ class TodoistTools:
 
                         if ctx:
                             ctx.info(
-                                f"Task created successfully via direct API: {task_json.get('id')}"
+                                f"Task created successfully via direct API: "
+                                f"{task_json.get('id')}"
                             )
 
                         # Convert to same format as the SDK would return
@@ -154,7 +153,8 @@ class TodoistTools:
                 if ctx:
                     ctx.error(f"Both methods failed. Direct API error: {str(e2)}")
                 raise ValueError(
-                    f"Failed to create Todoist task: {str(e1)}. Direct API error: {str(e2)}"
+                    f"Failed to create Todoist task: {str(e1)}. "
+                    f"Direct API error: {str(e2)}"
                 )
 
     async def get_tasks(

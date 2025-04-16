@@ -4,4 +4,4 @@ max-line-length = 88
 # Black compatibility settings
 extend-ignore = E203
 per-file-ignores =
-    __init__.py: F401 
+    __init__.py: F401
