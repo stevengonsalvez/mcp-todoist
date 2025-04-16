@@ -39,4 +39,4 @@
   "tag_resolver": {
     "method": "semver"
   }
-} 
+}

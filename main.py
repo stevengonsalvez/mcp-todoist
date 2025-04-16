@@ -1,11 +1,10 @@
 """
-MCP-Todoist Integration
+MCP-Todoist Integration.
 
 This is the main entry point for the MCP server that integrates with Todoist.
 It sets up the server and registers the tools and resources.
 """
 
-import asyncio
 from typing import Any, Dict, List, Optional, Tuple
 
 from mcp.server.fastmcp import Context, FastMCP
@@ -65,7 +64,8 @@ def create_server() -> FastMCP:
         Args:
             content: The content/title of the task
             description: Detailed description of the task (optional)
-            due_string: Natural language due date like 'tomorrow', 'next Monday' (optional)
+            due_string: Natural language due date like 'tomorrow', 'next Monday'
+                (optional)
             due_date: Due date in YYYY-MM-DD format (optional)
             due_datetime: Due date with time in RFC3339 format (optional)
             due_lang: Language for parsing due_string, e.g., 'en', 'fr' (optional)
@@ -901,7 +901,7 @@ def create_server() -> FastMCP:
 
 
 def main():
-    """Main entry point for the MCP-Todoist server."""
+    """Start the MCP-Todoist server."""
     try:
         # Run the server
         server.run()

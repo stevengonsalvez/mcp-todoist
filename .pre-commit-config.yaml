@@ -25,4 +25,4 @@ repos:
     hooks:
     -   id: flake8
         exclude: ^(.venv|venv|env|.git|__pycache__|build|dist)
-        additional_dependencies: [flake8-docstrings] 
+        additional_dependencies: [flake8-docstrings]

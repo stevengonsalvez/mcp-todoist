@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""
-Test script to inspect the Todoist API SDK internals and debug issues.
-"""
+"""Test script to inspect the Todoist API SDK internals and debug issues."""
 
 import inspect
 import os
@@ -12,6 +10,7 @@ from todoist_api_python.api import TodoistAPI
 
 
 def main():
+    """Run API inspection tests to debug Todoist SDK issues."""
     # Load API token from .env
     load_dotenv()
     api_token = os.getenv("TODOIST_API_TOKEN")
