@@ -54,7 +54,7 @@ We have implemented the core functionality of the MCP-Todoist integration:
 
 ## Active Decisions and Considerations
 
-1. **Authentication Approach**: 
+1. **Authentication Approach**:
    - Decision: Using API token authentication for simplicity
    - Consideration: Need to implement OAuth for more secure integration
 

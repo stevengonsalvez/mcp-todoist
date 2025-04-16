@@ -58,7 +58,7 @@
 
 ## Technical Constraints
 
-1. **Todoist API Rate Limits**: 
+1. **Todoist API Rate Limits**:
    - The Todoist API enforces rate limits that must be respected
    - Error handling must account for rate limit responses
 

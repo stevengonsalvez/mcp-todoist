@@ -1,12 +1,12 @@
 """
-Implementation of Todoist resources for the MCP server.
+Resource implementation for Todoist data.
 
-This module defines the MCP resources that allow language models to access
-Todoist data.
+This module defines the MCP resources for accessing and displaying
+Todoist data such as tasks, projects, and labels.
 """
 
 import json
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Optional, Tuple
 
 from mcp.server.fastmcp import Context
 from todoist_api_python.api import TodoistAPI
@@ -122,10 +122,17 @@ class TodoistResources:
                     priority_map = {1: "Normal", 2: "Medium", 3: "High", 4: "Urgent"}
                     priority_str = priority_map.get(task["priority"], "Normal")
 
-                    markdown += f"| {task['id']} | {task['content']} | {due_str} | {priority_str} |\n"
+                    task_id = task["id"]
+                    task_content = task["content"]
+                    markdown += (
+                        f"| {task_id} | {task_content} | {due_str} | {priority_str} |\n"
+                    )
 
                 # Add JSON data at the end for reference
-                markdown += "\n\n<details>\n<summary>Raw Data (Click to expand)</summary>\n\n```json\n"
+                markdown += (
+                    "\n\n<details>\n<summary>Raw Data (Click to expand)</summary>\n\n"
+                )
+                markdown += "```json\n"
                 markdown += json.dumps(tasks_data, indent=2)
                 markdown += "\n```\n</details>\n"
 
@@ -184,10 +191,17 @@ class TodoistResources:
                     favorite = "★" if project["is_favorite"] else ""
                     inbox = "✓" if project["is_inbox_project"] else ""
 
-                    markdown += f"| {project['id']} | {project['name']} | {favorite} | {inbox} |\n"
+                    project_id = project["id"]
+                    project_name = project["name"]
+                    markdown += (
+                        f"| {project_id} | {project_name} | {favorite} | {inbox} |\n"
+                    )
 
                 # Add JSON data at the end for reference
-                markdown += "\n\n<details>\n<summary>Raw Data (Click to expand)</summary>\n\n```json\n"
+                markdown += (
+                    "\n\n<details>\n<summary>Raw Data (Click to expand)</summary>\n\n"
+                )
+                markdown += "```json\n"
                 markdown += json.dumps(projects_data, indent=2)
                 markdown += "\n```\n</details>\n"
 
@@ -241,10 +255,16 @@ class TodoistResources:
                 markdown += "|:---|:------------|:-----|\n"
 
                 for section in sections_data:
-                    markdown += f"| {section['id']} | {section['name']} | {section['order']} |\n"
+                    section_id = section["id"]
+                    section_name = section["name"]
+                    section_order = section["order"]
+                    markdown += f"| {section_id} | {section_name} | {section_order} |\n"
 
                 # Add JSON data at the end for reference
-                markdown += "\n\n<details>\n<summary>Raw Data (Click to expand)</summary>\n\n```json\n"
+                markdown += (
+                    "\n\n<details>\n<summary>Raw Data (Click to expand)</summary>\n\n"
+                )
+                markdown += "```json\n"
                 markdown += json.dumps(sections_data, indent=2)
                 markdown += "\n```\n</details>\n"
 
@@ -299,10 +319,18 @@ class TodoistResources:
                 for label in labels_data:
                     favorite = "★" if label["is_favorite"] else ""
 
-                    markdown += f"| {label['id']} | {label['name']} | {label['color']} | {favorite} |\n"
+                    label_id = label["id"]
+                    label_name = label["name"]
+                    label_color = label["color"]
+                    markdown += (
+                        f"| {label_id} | {label_name} | {label_color} | {favorite} |\n"
+                    )
 
                 # Add JSON data at the end for reference
-                markdown += "\n\n<details>\n<summary>Raw Data (Click to expand)</summary>\n\n```json\n"
+                markdown += (
+                    "\n\n<details>\n<summary>Raw Data (Click to expand)</summary>\n\n"
+                )
+                markdown += "```json\n"
                 markdown += json.dumps(labels_data, indent=2)
                 markdown += "\n```\n</details>\n"
 
