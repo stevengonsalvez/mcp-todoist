@@ -16,7 +16,73 @@ This project provides a [Model Context Protocol (MCP)](https://modelcontextproto
 - Todoist account with API token
 - MCP-compatible client (like Claude Desktop)
 
+## Usage with Claude Desktop
+
+To use this MCP server with Claude Desktop, you have two options:
+
+### Option 1: Using uvx (Recommended)
+
+1. Install the package using uvx:
+   ```bash
+   uvx install mcp-todoist
+   ```
+
+2. Add the server to Claude Desktop's MCP configuration:
+   - Open Claude Desktop
+   - Go to Settings > Advanced
+   - Under "MCP Servers Configuration", add to the JSON configuration:
+     ```json
+     "mcpServers": {
+       "todoist": {
+         "command": "uvx",
+         "args": ["mcp-todoist"],
+         "env": {
+           "TODOIST_API_TOKEN": "your_todoist_api_token_here"
+         }
+       }
+     }
+     ```
+
+### Option 2: Using cloned repository
+
+1. Clone and install the package in development mode:
+   ```bash
+   git clone https://github.com/your-username/mcp-todoist.git
+   cd mcp-todoist
+   pip install -e .
+   ```
+
+2. Add the server to Claude Desktop's MCP configuration:
+   - Open Claude Desktop
+   - Go to Settings > Advanced
+   - Under "MCP Servers Configuration", add to the JSON configuration:
+     ```json
+     "mcpServers": {
+       "todoist": {
+         "command": "python",
+         "args": ["/full/path/to/mcp-todoist/main.py"],
+         "env": {
+           "TODOIST_API_TOKEN": "your_todoist_api_token_here"
+         }
+       }
+     }
+     ```
+
+3. Save the configuration and restart Claude Desktop
+
+4. You can now access the Todoist MCP server in your Claude conversations by asking Claude to use Todoist
+
+### Getting a Todoist API Token
+
+To obtain your Todoist API token:
+
+1. Log in to your Todoist account
+2. Go to Settings > Integrations
+3. Copy your API token from the "API token" section
+
 ## Installation
+
+If you want to install the package from source:
 
 1. Clone this repository:
    ```bash
@@ -35,14 +101,6 @@ This project provides a [Model Context Protocol (MCP)](https://modelcontextproto
    # Edit .env file to add your Todoist API token
    ```
 
-## Getting a Todoist API Token
-
-1. Log in to your Todoist account
-2. Go to Settings > Integrations
-3. Copy your API token from the "API token" section
-
-## Usage
-
 ### Running with MCP Dev Tools
 
 For testing and development, use the MCP dev tools:
@@ -58,53 +116,6 @@ To run with the MCP Inspector for visual interaction:
 ```bash
 mcp dev main.py
 ```
-
-### Using with Claude Desktop
-
-To use this MCP server with Claude Desktop, you have two options:
-
-#### Option 1: If you've cloned the repository
-
-1. Install the package in development mode:
-   ```bash
-   pip install -e .
-   ```
-
-2. Add the server to Claude Desktop's MCP configuration:
-   - Open Claude Desktop
-   - Go to Settings > Advanced
-   - Under "MCP Servers Configuration", add to the JSON configuration:
-     ```json
-     "mcpServers": {
-       "todoist": {
-         "command": "python",
-         "args": ["/full/path/to/mcp-todoist/main.py"]
-       }
-     }
-     ```
-
-#### Option 2: Using uvx
-
-1. Install the package using uvx:
-   ```bash
-   uvx install mcp-todoist
-   ```
-
-2. Add the server to Claude Desktop's MCP configuration:
-   - Open Claude Desktop
-   - Go to Settings > Advanced
-   - Under "MCP Servers Configuration", add to the JSON configuration:
-     ```json
-     "mcpServers": {
-       "todoist": {
-         "command": "uvx",
-         "args": ["mcp-todoist"]
-       }
-     }
-     ```
-
-3. Save the configuration and restart Claude Desktop
-4. You can now access the Todoist MCP server in your Claude conversations by asking Claude to use Todoist
 
 ## Available Tools
 
@@ -204,6 +215,33 @@ To contribute to the project or modify it for your needs:
 2. Make your changes
 3. Test with `mcp run main.py` or `mcp dev main.py`
 4. Submit a pull request
+
+### Git Hooks
+
+This project uses pre-commit hooks to ensure code quality and consistency:
+
+1. Install the development dependencies:
+   ```bash
+   pip install -e ".[dev]"
+   ```
+
+2. Install the git hooks:
+   ```bash
+   pre-commit install
+   ```
+
+3. Now, each time you commit, the hooks will run:
+   - Black for code formatting
+   - isort for import sorting
+   - flake8 for linting
+   - Various file checks (trailing whitespace, YAML validation, etc.)
+
+If any hook fails, the commit will be aborted. Fix the issues and try again.
+
+You can also run the hooks manually on all files:
+```bash
+pre-commit run --all-files
+```
 
 ### Publishing to PyPI
 
