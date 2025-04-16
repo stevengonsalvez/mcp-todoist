@@ -46,6 +46,8 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
+      env:
+        TODOIST_API_TOKEN: "mock_token_for_testing"
 
   build-and-publish:
     needs: test
