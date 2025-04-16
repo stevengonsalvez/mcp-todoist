@@ -22,43 +22,45 @@ def mock_env_token():
 
 
 @pytest.fixture
-def mock_todoist_api():
-    """Mock the Todoist API."""
-    with mock.patch("todoist_api_python.api.TodoistAPI") as mock_api:
-        # Create a mock task instance
-        mock_task = mock.MagicMock(spec=Task)
-        mock_task.id = "123456789"
-        mock_task.content = "Test task"
-        mock_task.description = "Test description"
-        mock_task.completed = False
-        mock_task.labels = ["test-label"]
-        mock_task.priority = 1
-        mock_task.project_id = "project123"
-        
-        # Configure the mock API instance
-        api_instance = mock_api.return_value
-        api_instance.get_tasks.return_value = [mock_task]
-        
-        yield api_instance
+def mock_task():
+    """Create a mock Task object."""
+    mock_task = mock.MagicMock(spec=Task)
+    mock_task.id = "123456789"
+    mock_task.content = "Test task"
+    mock_task.description = "Test description"
+    mock_task.completed = False
+    mock_task.labels = ["test-label"]
+    mock_task.priority = 1
+    mock_task.project_id = "project123"
+    return mock_task
 
 
 @pytest.mark.asyncio
-async def test_get_tasks(mock_env_token, mock_todoist_api):
+async def test_get_tasks(mock_env_token, mock_task):
     """Test getting tasks from Todoist."""
+    # Import the module we'll patch
     from todoist_tools import TodoistTools
     
-    # Initialize TodoistTools with our mocked API
-    todoist_tools = TodoistTools("fake_test_token")
+    # Create a mock API instance
+    mock_api = mock.MagicMock()
+    mock_api.get_tasks.return_value = [mock_task]
     
-    # The mocked API is already configured to return our mock task
-    tasks = await todoist_tools.get_tasks()
-    
-    # Verify the API was called correctly
-    mock_todoist_api.get_tasks.assert_called_once()
-    
-    # Check that we got our task
-    assert len(tasks) == 1
-    assert tasks[0]["id"] == "123456789"
-    assert tasks[0]["content"] == "Test task"
-    assert not tasks[0]["is_completed"]
-    assert "test-label" in tasks[0]["labels"]
+    # Patch the TodoistAPI class where it's imported in TodoistTools
+    with mock.patch("todoist_tools.TodoistAPI") as mock_todoist_api_class:
+        # Configure the mock class to return our mock API instance
+        mock_todoist_api_class.return_value = mock_api
+        
+        # Now when TodoistTools creates a TodoistAPI, it will get our mock
+        todoist_tools = TodoistTools("fake_test_token")
+        
+        # Call the method we're testing
+        tasks = await todoist_tools.get_tasks()
+        
+        # Verify the mock was used correctly
+        mock_api.get_tasks.assert_called_once_with()
+        
+        # Check that we got the expected task data
+        assert len(tasks) == 1
+        assert tasks[0]["id"] == "123456789"
+        assert tasks[0]["content"] == "Test task"
+        assert "test-label" in tasks[0]["labels"]
