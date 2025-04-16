@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Setup script for mcp-todoist package."""
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
@@ -24,14 +24,23 @@ setup(
     python_requires=">=3.10",
     install_requires=[
         "todoist-api-python",
-        "mcp-server>=0.5.0",
+        "mcp-server>=0.1.4",
         "pydantic",
         "python-dotenv",
         "aiohttp",
     ],
+    extras_require={
+        "dev": [
+            "black",
+            "flake8",
+            "isort",
+            "pytest",
+            "pytest-asyncio",
+        ],
+    },
     entry_points={
         "console_scripts": [
             "mcp-todoist=main:main",
         ],
     },
-) 
+)

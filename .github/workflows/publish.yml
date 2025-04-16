@@ -37,15 +37,15 @@ jobs:
     
     - name: Lint with flake8
       run: |
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=.venv,venv,env,.git,__pycache__,build,dist
     
     - name: Check format with black
       run: |
-        black --check .
+        black --check --exclude="/(\.venv|venv|env|\.git|__pycache__|build|dist)/" .
     
     - name: Check imports with isort
       run: |
-        isort --check-only --profile black .
+        isort --check-only --profile black --skip .venv --skip venv --skip env --skip .git --skip __pycache__ --skip build --skip dist .
     
     - name: Test with pytest
       run: |

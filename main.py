@@ -11,19 +11,20 @@ from typing import Any, Dict, List, Optional, Tuple
 from mcp.server.fastmcp import Context, FastMCP
 
 from config import load_config
-from todoist_tools import TodoistTools
 from todoist_resources import TodoistResources
+from todoist_tools import TodoistTools
+
 
 def create_server() -> FastMCP:
     """
     Create and configure the MCP server.
-    
+
     Returns:
         FastMCP: Configured MCP server
     """
     # Load configuration
     config = load_config()
-    
+
     # Create MCP server
     server = FastMCP(
         config.server_name,
@@ -34,13 +35,13 @@ def create_server() -> FastMCP:
             "python-dotenv",
         ],
     )
-    
+
     # Initialize Todoist clients
     todoist_tools = TodoistTools(config.todoist.api_token)
     todoist_resources = TodoistResources(config.todoist.api_token)
-    
+
     # Register Todoist tools
-    
+
     @server.tool()
     async def create_task(
         content: str,
@@ -60,7 +61,7 @@ def create_server() -> FastMCP:
     ) -> Dict[str, Any]:
         """
         Create a new task in Todoist.
-        
+
         Args:
             content: The content/title of the task
             description: Detailed description of the task (optional)
@@ -76,7 +77,7 @@ def create_server() -> FastMCP:
             assignee_id: User ID to whom the task is assigned (optional)
             day_order: Task order in Today or Next 7 days view (optional)
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             Dictionary containing task data
         """
@@ -96,7 +97,7 @@ def create_server() -> FastMCP:
             day_order=day_order,
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def get_tasks(
         project_id: Optional[str] = None,
@@ -107,14 +108,14 @@ def create_server() -> FastMCP:
     ) -> List[Dict[str, Any]]:
         """
         Get tasks from Todoist based on filters.
-        
+
         Args:
             project_id: Filter tasks by project ID (optional)
             section_id: Filter tasks by section ID (optional)
             label: Filter tasks by label name (optional)
             filter_query: Filter tasks using Todoist's filter language (optional)
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             List of task dictionaries
         """
@@ -125,7 +126,7 @@ def create_server() -> FastMCP:
             filter_query=filter_query,
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def get_task(
         task_id: str,
@@ -133,11 +134,11 @@ def create_server() -> FastMCP:
     ) -> Dict[str, Any]:
         """
         Get a specific task by ID.
-        
+
         Args:
             task_id: ID of the task to retrieve
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             Task dictionary
         """
@@ -145,7 +146,7 @@ def create_server() -> FastMCP:
             task_id=task_id,
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def update_task(
         task_id: str,
@@ -163,7 +164,7 @@ def create_server() -> FastMCP:
     ) -> Dict[str, Any]:
         """
         Update an existing task.
-        
+
         Args:
             task_id: ID of the task to update
             content: New task content/title (optional)
@@ -177,7 +178,7 @@ def create_server() -> FastMCP:
             assignee_id: User ID to whom the task is assigned (optional)
             day_order: Task order in Today or Next 7 days view (optional)
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             Updated task dictionary
         """
@@ -195,7 +196,7 @@ def create_server() -> FastMCP:
             day_order=day_order,
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def complete_task(
         task_id: str,
@@ -203,11 +204,11 @@ def create_server() -> FastMCP:
     ) -> Dict[str, str]:
         """
         Complete a task.
-        
+
         Args:
             task_id: ID of the task to complete
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             Dictionary with status information
         """
@@ -215,7 +216,7 @@ def create_server() -> FastMCP:
             task_id=task_id,
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def delete_task(
         task_id: str,
@@ -223,11 +224,11 @@ def create_server() -> FastMCP:
     ) -> Dict[str, str]:
         """
         Delete a task.
-        
+
         Args:
             task_id: ID of the task to delete
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             Dictionary with status information
         """
@@ -235,26 +236,26 @@ def create_server() -> FastMCP:
             task_id=task_id,
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def get_projects(
         ctx: Context = None,
     ) -> List[Dict[str, Any]]:
         """
         Get all projects.
-        
+
         Args:
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             List of project dictionaries
         """
         return await todoist_tools.get_projects(
             ctx=ctx,
         )
-    
+
     # Add new tools here
-    
+
     @server.tool()
     async def uncomplete_task(
         task_id: str,
@@ -262,11 +263,11 @@ def create_server() -> FastMCP:
     ) -> Dict[str, str]:
         """
         Uncomplete a task.
-        
+
         Args:
             task_id: ID of the task to uncomplete
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             Dictionary with status information
         """
@@ -274,7 +275,7 @@ def create_server() -> FastMCP:
             task_id=task_id,
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def add_project(
         name: str,
@@ -286,7 +287,7 @@ def create_server() -> FastMCP:
     ) -> Dict[str, Any]:
         """
         Create a new project.
-        
+
         Args:
             name: Name of the project
             parent_id: ID of the parent project for nested projects (optional)
@@ -294,7 +295,7 @@ def create_server() -> FastMCP:
             is_favorite: Whether the project is a favorite (optional)
             view_style: Style of the project view (optional)
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             Project dictionary
         """
@@ -306,7 +307,7 @@ def create_server() -> FastMCP:
             view_style=view_style,
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def get_project(
         project_id: str,
@@ -314,11 +315,11 @@ def create_server() -> FastMCP:
     ) -> Dict[str, Any]:
         """
         Get a specific project by ID.
-        
+
         Args:
             project_id: ID of the project to retrieve
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             Project dictionary
         """
@@ -326,7 +327,7 @@ def create_server() -> FastMCP:
             project_id=project_id,
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def update_project(
         project_id: str,
@@ -338,7 +339,7 @@ def create_server() -> FastMCP:
     ) -> Dict[str, Any]:
         """
         Update an existing project.
-        
+
         Args:
             project_id: ID of the project to update
             name: New name for the project (optional)
@@ -346,7 +347,7 @@ def create_server() -> FastMCP:
             is_favorite: Whether the project is a favorite (optional)
             view_style: New style for the project view (optional)
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             Updated project dictionary
         """
@@ -358,7 +359,7 @@ def create_server() -> FastMCP:
             view_style=view_style,
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def delete_project(
         project_id: str,
@@ -366,11 +367,11 @@ def create_server() -> FastMCP:
     ) -> Dict[str, str]:
         """
         Delete a project.
-        
+
         Args:
             project_id: ID of the project to delete
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             Dictionary with status information
         """
@@ -378,7 +379,7 @@ def create_server() -> FastMCP:
             project_id=project_id,
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def archive_project(
         project_id: str,
@@ -386,11 +387,11 @@ def create_server() -> FastMCP:
     ) -> Dict[str, str]:
         """
         Archive a project.
-        
+
         Args:
             project_id: ID of the project to archive
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             Dictionary with status information
         """
@@ -398,7 +399,7 @@ def create_server() -> FastMCP:
             project_id=project_id,
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def unarchive_project(
         project_id: str,
@@ -406,11 +407,11 @@ def create_server() -> FastMCP:
     ) -> Dict[str, str]:
         """
         Unarchive a project.
-        
+
         Args:
             project_id: ID of the project to unarchive
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             Dictionary with status information
         """
@@ -418,7 +419,7 @@ def create_server() -> FastMCP:
             project_id=project_id,
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def get_sections(
         project_id: Optional[str] = None,
@@ -426,11 +427,11 @@ def create_server() -> FastMCP:
     ) -> List[Dict[str, Any]]:
         """
         Get sections.
-        
+
         Args:
             project_id: Filter by project ID (optional)
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             List of section dictionaries
         """
@@ -438,7 +439,7 @@ def create_server() -> FastMCP:
             project_id=project_id,
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def get_section(
         section_id: str,
@@ -446,11 +447,11 @@ def create_server() -> FastMCP:
     ) -> Dict[str, Any]:
         """
         Get a specific section by ID.
-        
+
         Args:
             section_id: ID of the section to retrieve
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             Section dictionary
         """
@@ -458,7 +459,7 @@ def create_server() -> FastMCP:
             section_id=section_id,
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def add_section(
         name: str,
@@ -468,13 +469,13 @@ def create_server() -> FastMCP:
     ) -> Dict[str, Any]:
         """
         Create a new section.
-        
+
         Args:
             name: Name of the section
             project_id: ID of the project to add the section to
             order: Order of the section within the project (optional)
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             Section dictionary
         """
@@ -484,7 +485,7 @@ def create_server() -> FastMCP:
             order=order,
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def update_section(
         section_id: str,
@@ -493,12 +494,12 @@ def create_server() -> FastMCP:
     ) -> Dict[str, Any]:
         """
         Update an existing section.
-        
+
         Args:
             section_id: ID of the section to update
             name: New name for the section
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             Updated section dictionary
         """
@@ -507,7 +508,7 @@ def create_server() -> FastMCP:
             name=name,
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def delete_section(
         section_id: str,
@@ -515,11 +516,11 @@ def create_server() -> FastMCP:
     ) -> Dict[str, str]:
         """
         Delete a section.
-        
+
         Args:
             section_id: ID of the section to delete
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             Dictionary with status information
         """
@@ -527,24 +528,24 @@ def create_server() -> FastMCP:
             section_id=section_id,
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def get_labels(
         ctx: Context = None,
     ) -> List[Dict[str, Any]]:
         """
         Get all labels.
-        
+
         Args:
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             List of label dictionaries
         """
         return await todoist_tools.get_labels(
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def get_label(
         label_id: str,
@@ -552,11 +553,11 @@ def create_server() -> FastMCP:
     ) -> Dict[str, Any]:
         """
         Get a specific label by ID.
-        
+
         Args:
             label_id: ID of the label to retrieve
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             Label dictionary
         """
@@ -564,7 +565,7 @@ def create_server() -> FastMCP:
             label_id=label_id,
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def add_label(
         name: str,
@@ -574,13 +575,13 @@ def create_server() -> FastMCP:
     ) -> Dict[str, Any]:
         """
         Create a new label.
-        
+
         Args:
             name: Name of the label
             color: Color for the label (optional)
             favorite: Whether the label is a favorite (optional)
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             Label dictionary
         """
@@ -590,7 +591,7 @@ def create_server() -> FastMCP:
             favorite=favorite,
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def update_label(
         label_id: str,
@@ -601,14 +602,14 @@ def create_server() -> FastMCP:
     ) -> Dict[str, Any]:
         """
         Update an existing label.
-        
+
         Args:
             label_id: ID of the label to update
             name: New name for the label (optional)
             color: New color for the label (optional)
             favorite: Whether the label is a favorite (optional)
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             Updated label dictionary
         """
@@ -619,7 +620,7 @@ def create_server() -> FastMCP:
             favorite=favorite,
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def delete_label(
         label_id: str,
@@ -627,11 +628,11 @@ def create_server() -> FastMCP:
     ) -> Dict[str, str]:
         """
         Delete a label.
-        
+
         Args:
             label_id: ID of the label to delete
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             Dictionary with status information
         """
@@ -639,7 +640,7 @@ def create_server() -> FastMCP:
             label_id=label_id,
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def get_comments(
         task_id: Optional[str] = None,
@@ -648,12 +649,12 @@ def create_server() -> FastMCP:
     ) -> List[Dict[str, Any]]:
         """
         Get comments for a task or project.
-        
+
         Args:
             task_id: ID of the task to get comments for (optional)
             project_id: ID of the project to get comments for (optional)
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             List of comment dictionaries
         """
@@ -662,7 +663,7 @@ def create_server() -> FastMCP:
             project_id=project_id,
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def get_comment(
         comment_id: str,
@@ -670,11 +671,11 @@ def create_server() -> FastMCP:
     ) -> Dict[str, Any]:
         """
         Get a specific comment by ID.
-        
+
         Args:
             comment_id: ID of the comment to retrieve
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             Comment dictionary
         """
@@ -682,7 +683,7 @@ def create_server() -> FastMCP:
             comment_id=comment_id,
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def add_comment(
         content: str,
@@ -692,13 +693,13 @@ def create_server() -> FastMCP:
     ) -> Dict[str, Any]:
         """
         Add a comment to a task or project.
-        
+
         Args:
             content: Content of the comment
             task_id: ID of the task to add comment to (optional)
             project_id: ID of the project to add comment to (optional)
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             Comment dictionary
         """
@@ -708,7 +709,7 @@ def create_server() -> FastMCP:
             project_id=project_id,
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def update_comment(
         comment_id: str,
@@ -717,12 +718,12 @@ def create_server() -> FastMCP:
     ) -> Dict[str, Any]:
         """
         Update an existing comment.
-        
+
         Args:
             comment_id: ID of the comment to update
             content: New content for the comment
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             Updated comment dictionary
         """
@@ -731,7 +732,7 @@ def create_server() -> FastMCP:
             content=content,
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def delete_comment(
         comment_id: str,
@@ -739,11 +740,11 @@ def create_server() -> FastMCP:
     ) -> Dict[str, str]:
         """
         Delete a comment.
-        
+
         Args:
             comment_id: ID of the comment to delete
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             Dictionary with status information
         """
@@ -751,7 +752,7 @@ def create_server() -> FastMCP:
             comment_id=comment_id,
             ctx=ctx,
         )
-    
+
     @server.tool()
     async def get_collaborators(
         project_id: str,
@@ -759,11 +760,11 @@ def create_server() -> FastMCP:
     ) -> List[Dict[str, Any]]:
         """
         Get collaborators for a project.
-        
+
         Args:
             project_id: ID of the project to get collaborators for
             ctx: MCP context (injected automatically)
-            
+
         Returns:
             List of collaborator dictionaries
         """
@@ -771,106 +772,106 @@ def create_server() -> FastMCP:
             project_id=project_id,
             ctx=ctx,
         )
-    
+
     # Register Todoist resources
-    
+
     @server.resource("todoist://tasks")
     async def tasks_resource() -> Tuple[str, str]:
         """
         Get all tasks as a resource.
-        
+
         Returns:
             Tuple of (data, mime_type)
         """
         return await todoist_resources.get_tasks_resource()
-    
+
     @server.resource("todoist://tasks/project/{project_id}")
     async def project_tasks_resource(project_id: str) -> Tuple[str, str]:
         """
         Get tasks for a specific project as a resource.
-        
+
         Args:
             project_id: ID of the project to get tasks for
-            
+
         Returns:
             Tuple of (data, mime_type)
         """
         return await todoist_resources.get_tasks_resource(
             project_id=project_id,
         )
-    
+
     @server.resource("todoist://tasks/section/{section_id}")
     async def section_tasks_resource(section_id: str) -> Tuple[str, str]:
         """
         Get tasks for a specific section as a resource.
-        
+
         Args:
             section_id: ID of the section to get tasks for
-            
+
         Returns:
             Tuple of (data, mime_type)
         """
         return await todoist_resources.get_tasks_resource(
             section_id=section_id,
         )
-    
+
     @server.resource("todoist://tasks/label/{label}")
     async def label_tasks_resource(label: str) -> Tuple[str, str]:
         """
         Get tasks with a specific label as a resource.
-        
+
         Args:
             label: Label name to get tasks for
-            
+
         Returns:
             Tuple of (data, mime_type)
         """
         return await todoist_resources.get_tasks_resource(
             label=label,
         )
-    
+
     @server.resource("todoist://projects")
     async def projects_resource() -> Tuple[str, str]:
         """
         Get all projects as a resource.
-        
+
         Returns:
             Tuple of (data, mime_type)
         """
         return await todoist_resources.get_projects_resource()
-    
+
     @server.resource("todoist://sections/{project_id}")
     async def sections_resource(project_id: str) -> Tuple[str, str]:
         """
         Get sections for a project as a resource.
-        
+
         Args:
             project_id: ID of the project to get sections for
-            
+
         Returns:
             Tuple of (data, mime_type)
         """
         return await todoist_resources.get_sections_resource(
             project_id=project_id,
         )
-    
+
     @server.resource("todoist://labels")
     async def labels_resource() -> Tuple[str, str]:
         """
         Get all labels as a resource.
-        
+
         Returns:
             Tuple of (data, mime_type)
         """
         return await todoist_resources.get_labels_resource()
-    
+
     # Add some helpful prompts
-    
+
     @server.prompt()
     def create_task_prompt(content: str, due_date: Optional[str] = None) -> str:
         """
         Prompt to create a new task.
-        
+
         Args:
             content: Task content/title
             due_date: Optional due date in natural language
@@ -880,23 +881,24 @@ def create_server() -> FastMCP:
             prompt += f" due {due_date}"
         prompt += "."
         return prompt
-    
+
     @server.prompt()
     def show_tasks_prompt() -> str:
         """Prompt to show all tasks."""
         return "Please show me my current tasks in Todoist."
-    
+
     @server.prompt()
     def complete_task_prompt(task_name: str) -> str:
         """
         Prompt to complete a task by name.
-        
+
         Args:
             task_name: Name of the task to complete
         """
         return f"Please mark the task '{task_name}' as complete."
-    
+
     return server
+
 
 def main():
     """Main entry point for the MCP-Todoist server."""
@@ -906,9 +908,11 @@ def main():
     except Exception as e:
         print(f"Error starting MCP server: {str(e)}")
         import traceback
+
         traceback.print_exc()
         return 1
     return 0
+
 
 # Create the server instance at module level
 server = create_server()
