@@ -36,6 +36,7 @@ setup(
             "isort",
             "pytest",
             "pytest-asyncio",
+            "pre-commit",
         ],
     },
     entry_points={

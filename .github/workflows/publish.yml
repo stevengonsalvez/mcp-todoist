@@ -35,20 +35,12 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest black isort
-        pip install -e .
+        pip install pre-commit
+        pip install -e ".[dev]"
     
-    - name: Lint with flake8
+    - name: Run pre-commit checks
       run: |
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=.venv,venv,env,.git,__pycache__,build,dist
-    
-    - name: Check format with black
-      run: |
-        black --check --exclude="/(\.venv|venv|env|\.git|__pycache__|build|dist)/" .
-    
-    - name: Check imports with isort
-      run: |
-        isort --check-only --profile black --skip .venv --skip venv --skip env --skip .git --skip __pycache__ --skip build --skip dist .
+        pre-commit run --all-files
     
     - name: Test with pytest
       run: |
